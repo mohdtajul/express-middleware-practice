@@ -1,5 +1,6 @@
 const express = require("express")
 const app = express()
+const ExpressError = require('./ExpressError')
 
 const port = 3000;
 
@@ -18,7 +19,7 @@ app.use((req,res,next)=>{
     next()
 });
 
-// Auth middleware or route level middleware
+// Authentication middleware or route level middleware
 function isLoggedIn(req,res,next){
     if(!req.user){
         return res.send("you need to log in first");
@@ -46,8 +47,22 @@ app.get("/listing/new",validatingListing,(req,res)=>{
 // Error handling middleware
 app.use((err,req,res,next)=>{
     console.log(err);
-    res.status(500).send("somthing broke")
+    res.status(404).send("somthing broke")
 })
+
+const checkToken = (req,res,next)=>{
+    const {token } = req.query;
+    if(token == "giveaccess"){
+        next()
+    }
+    throw new ExpressError(404,"access denied")
+}
+
+app.get("/api",checkToken,(req,res)=>{
+    res.send("data received")
+});
+
+
 
 app.listen(port,()=>{
     console.log(`server is running on" ${port}`);
