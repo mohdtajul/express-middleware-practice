@@ -48,6 +48,10 @@ app.get("/listing/new",validatingListing,(req,res)=>{
 app.use((err,req,res,next)=>{
     console.log(err);
     res.status(404).send("somthing broke")
+}) 
+
+app.get("/admin",(req,res)=>{
+    throw new ExpressError(403,"access to admin is forbidden")
 })
 
 const checkToken = (req,res,next)=>{
